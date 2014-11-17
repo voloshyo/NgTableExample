@@ -2,51 +2,73 @@
     .directive('storetable', function () {
         return {
             restrict: "E",
-            templateUrl: '../views/storetable.html'
-        };
-    })
+            templateUrl: '../views/storetable.html',
+            scope: {
+                mode: '='
+            },
 
-.controller('storetableCtrl', function ($scope, $rootScope, ngTableParams, $filter) {
+            controller: function ($scope, getShortDataFctr, getLargeDataFctr, ngTableParams, $filter) {
+                $scope.products = [];
+                $scope.productsshort = [];
+                $scope.productslarge = [];
 
-    function init() {
-        var rs = $rootScope;
-        $scope.mode = 'short';
-        $scope.products = rs.shlist;
-        $scope.currentPage = 1;
-        $scope.productsToView = function() { return $scope.products.slice(0, 50); };
-    };
-    init();
-    
+                getShortDataFctr.success(function (data) {
+                    $scope.mode = "short";
+                    $scope.products = parseData(data);
+                    $scope.productsshort = parseData(data);
+                    $scope.currentPage = 1;
+                });
 
-    $scope.$watch('mode', function() {
-        if ($scope.mode === 'short') {
-            $scope.products = $rootScope.shlist;
+                getLargeDataFctr.success(function (data) {
+                    $scope.productslarge = parseData(data);
+                });
+
+                function parseData(data) {
+                    var arr = [];
+                    var arrProps = [];
+                    var arrTitles = [];
+                    var headers = _(data).first();
+                    _(headers).each(function(header) {
+                        arrProps.push(header.field);
+                        arrTitles.push(header.title);
+                    });
+
+                    var prods = data.slice(1, data.length);
+
+                    _(prods).each(function (prod) {
+                        var arrValues = prod;
+                        var obj = _.object(arrProps, arrValues);
+                        arr.push(obj);
+                    });
+                    $scope.headers = arrTitles;
+
+                    return arr;
+                };
+
+                $scope.$watch('mode', function () {
+                    if ($scope.mode === 'short') {
+                        $scope.products = $scope.productsshort;
+                    };
+                    if ($scope.mode === 'large') {
+                        $scope.products = $scope.productslarge;
+                    };
+                });
+
+
+                $scope.tableParams = new ngTableParams({
+                    page: 1,            
+                    count: 50,
+                    sorting: {
+                        id: 'asc' 
+                    }
+                }, {
+                    getData: function ($defer, params) {
+                        $scope.products = params.sorting() ?
+                                            $filter('orderBy')($scope.products, params.orderBy()) : $scope.products;
+                        $defer.resolve( $scope.products);
+                    }
+                });
+            }
         };
-        
-        if ($scope.mode === 'large') {
-            $scope.products =  $rootScope.llist;
-        };
-            $scope.productsToView = function() { return $scope.products.slice((($scope.currentPage - 1) * 50), ($scope.currentPage) * 50); };
     });
 
-
-    //var data = $scope.productsToView();
-
-    //$scope.tableParams = new ngTableParams({
-    //    page: 1,            // show first page
-    //    count: 10,          // count per page
-    //    sorting: {
-    //        name: 'asc'     // initial sorting
-    //    }
-    //}, {
-    //    total: data.length, // length of data
-    //    getData: function ($defer, params) {
-    //        // use build-in angular filter
-    //        var orderedData = params.sorting() ?
-    //                            $filter('orderBy')(data, params.orderBy()) :
-    //                            data;
-
-    //        $defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
-    //    }
-    //});
-})

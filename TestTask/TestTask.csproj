@@ -57,6 +57,7 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="css\modules.css" />
     <Content Include="data\products.txt" />
     <Content Include="data\productsLarge.txt" />
     <Content Include="images\ajax-loader.gif" />
@@ -64,7 +65,6 @@
     <Content Include="libs\css\ng-table.css" />
     <Content Include="libs\js\angular.js" />
     <Content Include="libs\js\angular_route.js" />
-    <Content Include="libs\js\bootstrap-table.min.js" />
     <Content Include="libs\js\jquery-1.11.1.js" />
     <Content Include="libs\js\ng-table.js" />
     <Content Include="libs\js\ui-bootstrap-tpls-0.11.2.js" />
@@ -74,6 +74,7 @@
     <Content Include="libs\css\bootstrap.css" />
     <Content Include="libs\js\angular_resource.js" />
     <Content Include="libs\js\bootstrap.js" />
+    <Content Include="scripts\filter.js" />
     <Content Include="scripts\storetable.js" />
     <Content Include="index.html" />
     <Content Include="views\storetable.html" />

@@ -1,32 +1,22 @@
 ﻿var mainmodule = angular.module('main', ['ngResource', 'ngRoute', 'ui.bootstrap', 'ngTable']);
 
-mainmodule.factory('getData', function ($http) {
 
-    return {
-        shortData:  $http.get('../data/products.txt'),
-        largeData: $http.get('../data/productsLarge.txt')
-       };
+mainmodule.factory('getShortDataFctr', function ($http) {
+
+    return $http.get('../data/products.txt');
 });
 
-mainmodule.controller('mainCtrl', function ($rootScope, $q, getData) {
+mainmodule.factory('getLargeDataFctr', function ($http) {
 
-    var ppromises = [getData.shortData, getData.largeData];
-
-    $q.all(ppromises).then(function (result) {
-        var tmp = [];
-        angular.forEach(result, function (responce) {
-            tmp.push(responce.data);
-        });
-        return tmp;
-    }).then(function (tempRes) {
-        var t = [];
-        _(tempRes).each(function (item) { t.push(item); });
-        return t;
-    }).then(function (tmpr) {
-        $rootScope.shlist = tmpr[0];
-        $rootScope.llist = tmpr[1];
-    });
+    return $http.get('../data/productsLarge.txt');
 });
+
+mainmodule.config(['$routeProvider', function ($routeProvider) {
+    $routeProvider
+            .when('/index', { templateUrl: 'index.html'})
+            .otherwise({ redirectTo: '/index' });
+}]);
+
 
 
 
